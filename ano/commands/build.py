@@ -116,6 +116,7 @@ class Build(Command):
 
     def discover(self, args):
         board = self.e.board_model(args.board_model)
+        print "DEBUG: board[_coredir] = %s" % board['_coredir']
 
         core_place = os.path.join(board['_coredir'], 'cores', board['build']['core'])
         core_header = 'Arduino.h' if self.e.arduino_lib_version.major else 'WProgram.h'
@@ -127,7 +128,7 @@ class Build(Command):
             self.e.find_dir('arduino_variants_dir', ['.'], [variants_place],
                             human_name='Arduino variants directory')
 
-        self.e.find_arduino_dir('arduino_core_libraries_dir', [os.path.join(board['_coredir'], 'libraries')],
+        self.e.find_arduino_dir('arduino_core_libraries_dir', ['libraries'],
                                 human_name='Arduino core libraries')
 
         self.e.find_arduino_dir('arduino_libraries_dir', ['libraries'],

@@ -7,6 +7,7 @@ import pickle
 import platform
 import hashlib
 import re
+import pprint
 
 try:
     from collections import OrderedDict
@@ -84,6 +85,8 @@ class Environment(dict):
         '/usr/local/share/arduino',
         '/usr/share/arduino',
     ]
+
+    arduino_user_libraries_dir = 'lib'
 
     if platformSystem == 'Darwin':
         arduino_dist_dir_guesses.insert(0, '/Applications/Arduino.app/Contents/Resources/Java')
@@ -190,9 +193,10 @@ class Environment(dict):
             self[key] = results
             return results
 
-        print colorize('FAILED', 'red')
-        raise Abort("%s not found. Searched in following places: %s" %
+        print ('FAILED')
+        print ("%s not found. Searched in following places: %s" %
                     (human_name, ''.join(['\n  - ' + p for p in places])))
+        return results
 
     def find_dir(self, key, items, places, human_name=None, multi=False):
         return self._find(key, items or ['.'], places, human_name, join=False, multi=multi)
@@ -253,6 +257,7 @@ class Environment(dict):
         self['board_models'] = BoardModels()
         self['board_models'].default = self.default_board_model
         for boards_txt in boards_txts:
+            print "DEBUG: env.py: boards_txt = %s" % boards_txt
             with open(boards_txt) as f:
                 for line in f:
                     line = line.strip()
@@ -285,9 +290,14 @@ class Environment(dict):
 
                     subdict[multikey[-1]] = val
 
-                    # store spectial `_coredir` value on top level so we later can build
+                    # store special `_coredir` value on top level so we later can build
                     # paths relative to a core directory of a specific board model
                     self['board_models'][multikey[0]]['_coredir'] = os.path.dirname(boards_txt)
+
+
+        print "DEBUG--------------"
+        pprint.pprint(self['board_models'])
+        print "DEBUG END----------"
 
         return self['board_models']
 
